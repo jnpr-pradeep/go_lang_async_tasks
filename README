@@ -1,0 +1,27 @@
+
+The server will run on :8080 port and can be accessed as http://localhost:8080/ and uses the in memory as a database.
+
+It will help to demonstrate the long running (asynchronous tasks).
+
+In this example - every task have 3 starts - Pending, Started, Completed.
+
+Pending - Task will be created with Pending state - Yet start on the processing.
+Started - Task status updated after 10sec - Intermediate state
+Complete - Indicates completion of the task - after 70 sec of creation.
+
+Start Task:
+http://localhost:8080/start_task
+
+Get Task Status:
+http://localhost:8080/get_task_stats/{id}
+
+List all the tasks in the system
+http://localhost:8080/list_tasks
+
+It uses the inbuilt Go routines with DB (in memory for demo) to bring the Async nature.
+
+How to use the Application:
+
+go run main.go
+
+with the above command server starts and clients can be used from the IE or Chrome (web).
