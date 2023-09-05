@@ -28,19 +28,21 @@ func generateID() string {
 
 func insertTask(t Task) Task {
     t.ID = generateID()
-     TASK_STORE[t.ID] = t
+    t.UpdatedAt = time.Now()
+    TASK_STORE[t.ID] = t
     return t
 }
 
 func updateTaskStatus(taskID string, newStatus string) Task {
     t :=  TASK_STORE[taskID]
     t.Status = newStatus
-     TASK_STORE[taskID] = t
+    t.UpdatedAt = time.Now()
+    TASK_STORE[taskID] = t
     return t
 }
 
 func readTaskStatus(taskID string) Task {
-    t :=  TASK_STORE[taskID]
+    t := TASK_STORE[taskID]
     return t
 }
 
@@ -52,11 +54,14 @@ func createTask(w http.ResponseWriter, r *http.Request) {
 
     fmt.Printf("Inserted task with ID %s\n", t.ID)
     go func() {
-        // Sleep for 2 seconds
+        // Sleep for 10 seconds
+        time.Sleep(10 * time.Second)
+        t := updateTaskStatus(t.ID, "Started")
+
         time.Sleep(60 * time.Second)
 
         // Update the status of the task
-        t := updateTaskStatus(t.ID, "Completed")
+        t = updateTaskStatus(t.ID, "Completed")
         fmt.Printf("Task status updated, status=%s\n", t.Status)
     }()
     fmt.Printf("Returning from ServiceMethod for id=%s\n", t.ID)
@@ -75,9 +80,21 @@ func getTaskStatus(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, msg)
 }
 
+func listTasks(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("Entered into listTasks\n")
+
+    for _, t := range TASK_STORE {
+        msg := fmt.Sprintf("Task ID=%s, Name=%s, Status=%s, UpdatedAt=%v", t.ID, t.Name, t.Status, t.UpdatedAt)
+        fmt.Fprintln(w, msg)
+    }
+
+    
+}
+
 func main() {
     http.HandleFunc("/start_task", createTask)
     http.HandleFunc("/get_task_status/", getTaskStatus)
+    http.HandleFunc("/list_tasks/", listTasks)
 
     log.Println("Server listening on port 8080...")
     err := http.ListenAndServe(":8080", nil)
